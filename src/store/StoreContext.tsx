@@ -2,6 +2,15 @@ import { createContext, useContext, type ReactNode } from 'react'
 import { useLocalStorage, uid } from '../lib/storage'
 import type { Fach, Thema, LernSession } from '../types'
 
+export interface Backup {
+  app: 'lern-tracker'
+  version: 1
+  exportiertAm: string
+  faecher: Fach[]
+  themen: Thema[]
+  sessions: LernSession[]
+}
+
 interface StoreValue {
   faecher: Fach[]
   themen: Thema[]
@@ -17,6 +26,11 @@ interface StoreValue {
 
   addSession: (fachId: string, minuten: number, datum: string) => void
   removeSession: (id: string) => void
+
+  /** Alle Daten als Backup-Objekt (zum Herunterladen). */
+  exportData: () => Backup
+  /** Daten ersetzen (replace) oder zusammenführen (merge) aus einem Backup. */
+  importData: (data: Partial<Backup>, modus: 'replace' | 'merge') => void
 }
 
 const StoreContext = createContext<StoreValue | null>(null)
@@ -51,6 +65,41 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     addSession: (fachId, minuten, datum) =>
       setSessions((prev) => [...prev, { id: uid(), fachId, minuten, datum }]),
     removeSession: (id) => setSessions((prev) => prev.filter((s) => s.id !== id)),
+
+    exportData: () => ({
+      app: 'lern-tracker',
+      version: 1,
+      exportiertAm: new Date().toISOString(),
+      faecher,
+      themen,
+      sessions,
+    }),
+
+    importData: (data, modus) => {
+      const nf = Array.isArray(data.faecher) ? data.faecher : []
+      const nt = Array.isArray(data.themen) ? data.themen : []
+      const ns = Array.isArray(data.sessions) ? data.sessions : []
+
+      if (modus === 'replace') {
+        setFaecher(nf)
+        setThemen(nt)
+        setSessions(ns)
+        return
+      }
+      // merge: nur Einträge mit neuer ID anhängen (keine Duplikate)
+      setFaecher((prev) => {
+        const ids = new Set(prev.map((x) => x.id))
+        return [...prev, ...nf.filter((x) => !ids.has(x.id))]
+      })
+      setThemen((prev) => {
+        const ids = new Set(prev.map((x) => x.id))
+        return [...prev, ...nt.filter((x) => !ids.has(x.id))]
+      })
+      setSessions((prev) => {
+        const ids = new Set(prev.map((x) => x.id))
+        return [...prev, ...ns.filter((x) => !ids.has(x.id))]
+      })
+    },
   }
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>

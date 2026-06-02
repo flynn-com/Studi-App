@@ -6,6 +6,7 @@ import { Faecher } from './pages/Faecher'
 import { Kalender } from './pages/Kalender'
 import { Lernzeit } from './pages/Lernzeit'
 import { Noten } from './pages/Noten'
+import { Einstellungen } from './pages/Einstellungen'
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
             <Route path="kalender" element={<Kalender />} />
             <Route path="lernzeit" element={<Lernzeit />} />
             <Route path="noten" element={<Noten />} />
+            <Route path="einstellungen" element={<Einstellungen />} />
           </Route>
         </Routes>
       </HashRouter>

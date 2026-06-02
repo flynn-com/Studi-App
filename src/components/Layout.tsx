@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { CalendarDays, GraduationCap, LayoutDashboard, Timer, BookOpen } from 'lucide-react'
+import { CalendarDays, GraduationCap, LayoutDashboard, Timer, BookOpen, Settings } from 'lucide-react'
 
 const links = [
   { to: '/', label: 'Dashboard', short: 'Start', icon: LayoutDashboard, end: true },
@@ -42,16 +42,41 @@ export function Layout() {
             </NavLink>
           ))}
         </nav>
+
+        <NavLink
+          to="/einstellungen"
+          className={({ isActive }) =>
+            `mt-auto mx-3 mb-3 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+              isActive
+                ? 'bg-indigo-500/15 text-indigo-300 ring-1 ring-inset ring-indigo-500/30'
+                : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+            }`
+          }
+        >
+          <Settings size={18} />
+          Einstellungen
+        </NavLink>
       </aside>
 
       {/* ===== iPhone: obere Kopfleiste ===== */}
-      <header className="pt-safe sticky top-0 z-20 flex items-center gap-2 border-b border-white/10 bg-slate-950/70 backdrop-blur-xl md:hidden [padding-left:max(1rem,env(safe-area-inset-left))] [padding-right:max(1rem,env(safe-area-inset-right))]">
+      <header className="pt-safe sticky top-0 z-20 flex items-center justify-between border-b border-white/10 bg-slate-950/70 backdrop-blur-xl md:hidden [padding-left:max(1rem,env(safe-area-inset-left))] [padding-right:max(1rem,env(safe-area-inset-right))]">
         <div className="flex items-center gap-2 py-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-500/30">
             <GraduationCap size={18} />
           </div>
           <div className="text-base font-bold text-white">Lern-Tracker</div>
         </div>
+        <NavLink
+          to="/einstellungen"
+          className={({ isActive }) =>
+            `-mr-2 flex h-10 w-10 items-center justify-center rounded-lg transition-colors ${
+              isActive ? 'text-indigo-400' : 'text-slate-400 hover:bg-white/5'
+            }`
+          }
+          aria-label="Einstellungen"
+        >
+          <Settings size={20} />
+        </NavLink>
       </header>
 
       {/* ===== Inhalt ===== */}

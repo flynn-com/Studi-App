@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Pause, Play, RotateCcw } from 'lucide-react'
 import { useStore } from '../store/StoreContext'
+import { feiern } from '../lib/effekte'
 import { heuteIso } from '../lib/datum'
 
 const LERN_MIN = 25
@@ -8,7 +9,7 @@ const PAUSE_MIN = 5
 
 /** Pomodoro-Timer. Bei Abschluss einer Lernphase wird automatisch eine Session gespeichert. */
 export function PomodoroTimer() {
-  const { faecher, addSession } = useStore()
+  const { faecher, addSession, effekteAn } = useStore()
   const [fachId, setFachId] = useState('')
   const [modus, setModus] = useState<'lernen' | 'pause'>('lernen')
   const [sekunden, setSekunden] = useState(LERN_MIN * 60)
@@ -33,6 +34,7 @@ export function PomodoroTimer() {
     setLaeuft(false)
     if (modus === 'lernen') {
       if (fachId) addSession(fachId, LERN_MIN, heuteIso())
+      if (effekteAn) feiern()
       setModus('pause')
       setSekunden(PAUSE_MIN * 60)
     } else {

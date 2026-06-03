@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { CalendarDays, GraduationCap, LayoutDashboard, Timer, BookOpen, Settings } from 'lucide-react'
+import { CalendarDays, GraduationCap, LayoutDashboard, Timer, BookOpen, Settings, Trophy } from 'lucide-react'
+import { ErfolgWatcher } from './ErfolgWatcher'
 
 const links = [
   { to: '/', label: 'Dashboard', short: 'Start', icon: LayoutDashboard, end: true },
@@ -7,11 +8,13 @@ const links = [
   { to: '/kalender', label: 'Kalender', short: 'Kalender', icon: CalendarDays, end: false },
   { to: '/lernzeit', label: 'Lernzeit', short: 'Lernzeit', icon: Timer, end: false },
   { to: '/noten', label: 'Noten', short: 'Noten', icon: GraduationCap, end: false },
+  { to: '/erfolge', label: 'Erfolge', short: 'Erfolge', icon: Trophy, end: false },
 ]
 
 export function Layout() {
   return (
     <div className="flex min-h-[100dvh] flex-col md:flex-row">
+      <ErfolgWatcher />
       {/* ===== iPad / Desktop: linke Sidebar ===== */}
       <aside className="pt-safe pb-safe pl-safe sticky top-0 z-10 hidden h-[100dvh] w-60 shrink-0 flex-col border-r border-white/10 bg-slate-950/60 backdrop-blur-xl md:flex">
         <div className="flex items-center gap-2 px-5 py-5">

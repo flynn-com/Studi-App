@@ -36,6 +36,10 @@ interface StoreValue {
   exportData: () => Backup
   /** Daten ersetzen (replace) oder zusammenführen (merge) aus einem Backup. */
   importData: (data: Partial<Backup>, modus: 'replace' | 'merge') => void
+
+  /** Belohnungs-Effekte (Konfetti/Sound/Vibration) an/aus. */
+  effekteAn: boolean
+  setEffekteAn: (an: boolean) => void
 }
 
 const StoreContext = createContext<StoreValue | null>(null)
@@ -44,6 +48,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [faecher, setFaecher] = useLocalStorage<Fach[]>('lt.faecher', [])
   const [themen, setThemen] = useLocalStorage<Thema[]>('lt.themen', [])
   const [sessions, setSessions] = useLocalStorage<LernSession[]>('lt.sessions', [])
+  const [effekteAn, setEffekteAnState] = useLocalStorage<boolean>('lt.effekte', true)
 
   const value: StoreValue = {
     faecher,
@@ -137,6 +142,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         return [...prev, ...ns.filter((x) => !ids.has(x.id))]
       })
     },
+
+    effekteAn,
+    setEffekteAn: (an) => setEffekteAnState(an),
   }
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>

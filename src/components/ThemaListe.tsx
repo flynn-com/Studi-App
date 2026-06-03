@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Check, ChevronDown, ChevronRight, ListChecks, Plus, StickyNote, X } from 'lucide-react'
 import { useStore } from '../store/StoreContext'
+import { feiern, tick } from '../lib/effekte'
 import type { Thema } from '../types'
 
 /** Themen/Aufgaben eines Fachs: anlegen, abhaken, mit Details & Unterpunkten. */
@@ -45,8 +46,15 @@ export function ThemaListe({ fachId }: { fachId: string }) {
 }
 
 function ThemaItem({ thema }: { thema: Thema }) {
-  const { toggleThema, updateThema, removeThema, addUnterpunkt, toggleUnterpunkt, removeUnterpunkt } =
-    useStore()
+  const {
+    toggleThema,
+    updateThema,
+    removeThema,
+    addUnterpunkt,
+    toggleUnterpunkt,
+    removeUnterpunkt,
+    effekteAn,
+  } = useStore()
   const [offen, setOffen] = useState(false)
   const [upTitel, setUpTitel] = useState('')
 
@@ -66,7 +74,11 @@ function ThemaItem({ thema }: { thema: Thema }) {
       {/* Kopfzeile */}
       <div className="group flex items-center gap-2 px-2 py-1.5">
         <button
-          onClick={() => toggleThema(thema.id)}
+          onClick={() => {
+            const wirdErledigt = !thema.erledigt
+            toggleThema(thema.id)
+            if (wirdErledigt && effekteAn) feiern()
+          }}
           className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors ${
             thema.erledigt
               ? 'border-emerald-500 bg-emerald-500 text-white'
@@ -150,7 +162,11 @@ function ThemaItem({ thema }: { thema: Thema }) {
               {ups.map((u) => (
                 <div key={u.id} className="group/up flex items-center gap-2">
                   <button
-                    onClick={() => toggleUnterpunkt(thema.id, u.id)}
+                    onClick={() => {
+                      const wird = !u.erledigt
+                      toggleUnterpunkt(thema.id, u.id)
+                      if (wird && effekteAn) tick()
+                    }}
                     className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors ${
                       u.erledigt
                         ? 'border-emerald-500 bg-emerald-500 text-white'

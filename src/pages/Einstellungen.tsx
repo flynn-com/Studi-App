@@ -3,7 +3,7 @@ import { Download, Upload, Database, CheckCircle2, AlertTriangle } from 'lucide-
 import { useStore, type Backup } from '../store/StoreContext'
 
 export function Einstellungen() {
-  const { faecher, themen, sessions, exportData, importData } = useStore()
+  const { faecher, themen, sessions, exportData, importData, effekteAn, setEffekteAn } = useStore()
   const fileRef = useRef<HTMLInputElement>(null)
   const [meldung, setMeldung] = useState<{ ok: boolean; text: string } | null>(null)
 
@@ -77,6 +77,30 @@ export function Einstellungen() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Effekte */}
+      <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-slate-900/60 p-5 backdrop-blur">
+        <div>
+          <h2 className="text-sm font-semibold text-slate-200">Belohnungs-Effekte</h2>
+          <p className="mt-1 text-sm text-slate-400">
+            Konfetti, Sound &amp; Vibration beim Abschließen und Freischalten von Abzeichen.
+          </p>
+        </div>
+        <button
+          role="switch"
+          aria-checked={effekteAn}
+          onClick={() => setEffekteAn(!effekteAn)}
+          className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${
+            effekteAn ? 'bg-indigo-500' : 'bg-white/15'
+          }`}
+        >
+          <span
+            className={`absolute top-1 h-5 w-5 rounded-full bg-white transition-all ${
+              effekteAn ? 'left-6' : 'left-1'
+            }`}
+          />
+        </button>
       </div>
 
       {/* Export */}

@@ -1,14 +1,19 @@
 import { Link } from 'react-router-dom'
-import { CalendarPlus, FileCheck2, GraduationCap, Sparkles } from 'lucide-react'
+import { CalendarPlus, ChevronRight, FileCheck2, GraduationCap, Sparkles, Trophy } from 'lucide-react'
 import { useStore } from '../store/StoreContext'
 import { nachPrioritaet, fortschritt } from '../lib/prio'
+import { computeStats, gesamtXp, levelInfo, freigeschaltete, ERFOLGE } from '../lib/erfolge'
 import { CountdownBadge } from '../components/CountdownBadge'
 import { Fortschrittsbalken } from '../components/Fortschrittsbalken'
 import { formatDeDate } from '../lib/datum'
 
 export function Dashboard() {
-  const { faecher, themen } = useStore()
+  const { faecher, themen, sessions } = useStore()
   const sortiert = nachPrioritaet(faecher, themen)
+
+  const stats = computeStats({ faecher, themen, sessions })
+  const lvl = levelInfo(gesamtXp(stats))
+  const badges = freigeschaltete(stats).length
 
   return (
     <div className="space-y-6">
@@ -21,6 +26,33 @@ export function Dashboard() {
           Deine Fächer nach Dringlichkeit sortiert — oben steht, was am wichtigsten ist.
         </p>
       </header>
+
+      {/* Level-Banner */}
+      <Link
+        to="/erfolge"
+        className="block rounded-2xl border border-white/10 bg-gradient-to-br from-indigo-500/15 to-violet-500/10 p-4 backdrop-blur transition-colors hover:border-white/20"
+      >
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-lg shadow-amber-500/30">
+            <Trophy size={22} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="font-semibold text-white">Level {lvl.level}</span>
+              <span className="text-xs text-slate-400">
+                {badges}/{ERFOLGE.length} Abzeichen · {lvl.xpGesamt} XP
+              </span>
+            </div>
+            <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-violet-400"
+                style={{ width: `${Math.round(lvl.fortschritt * 100)}%` }}
+              />
+            </div>
+          </div>
+          <ChevronRight size={18} className="shrink-0 text-slate-500" />
+        </div>
+      </Link>
 
       {faecher.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-white/15 bg-slate-900/40 p-10 text-center">

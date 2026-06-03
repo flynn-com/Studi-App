@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { useStore } from '../store/StoreContext'
 import { PomodoroTimer } from '../components/PomodoroTimer'
+import { Heatmap } from '../components/Heatmap'
 import { heuteIso, montagDerWoche } from '../lib/datum'
 
 const inputCls =
@@ -139,6 +140,8 @@ export function Lernzeit() {
           </div>
         </div>
       </div>
+
+      <Heatmap />
     </div>
   )
 }

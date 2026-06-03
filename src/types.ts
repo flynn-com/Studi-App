@@ -34,6 +34,14 @@ export interface LernSession {
   minuten: number
 }
 
+export interface Planeintrag {
+  id: string
+  datum: string // ISO-Tag, an dem etwas gelernt werden soll
+  titel: string // was gelernt werden soll
+  fachId?: string // optionale Zuordnung zu einem Fach (für Farbe)
+  erledigt: boolean
+}
+
 export const FARBEN = [
   '#6366f1', // indigo
   '#0ea5e9', // sky

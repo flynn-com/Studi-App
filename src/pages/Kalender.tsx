@@ -19,7 +19,7 @@ export function Kalender() {
         </p>
       </header>
 
-      <MonatsKalender faecher={faecher} />
+      <MonatsKalender />
 
       <section>
         <h2 className="mb-3 text-lg font-semibold text-white">Kommende Termine</h2>

@@ -1,6 +1,6 @@
 import { createContext, useContext, type ReactNode } from 'react'
 import { useLocalStorage, uid } from '../lib/storage'
-import type { Fach, Thema, LernSession } from '../types'
+import type { Fach, Thema, LernSession, Planeintrag } from '../types'
 
 export interface Backup {
   app: 'lern-tracker'
@@ -9,6 +9,7 @@ export interface Backup {
   faecher: Fach[]
   themen: Thema[]
   sessions: LernSession[]
+  plan: Planeintrag[]
 }
 
 interface StoreValue {
@@ -32,6 +33,11 @@ interface StoreValue {
   addSession: (fachId: string, minuten: number, datum: string) => void
   removeSession: (id: string) => void
 
+  plan: Planeintrag[]
+  addPlan: (datum: string, titel: string, fachId?: string) => void
+  togglePlan: (id: string) => void
+  removePlan: (id: string) => void
+
   /** Alle Daten als Backup-Objekt (zum Herunterladen). */
   exportData: () => Backup
   /** Daten ersetzen (replace) oder zusammenführen (merge) aus einem Backup. */
@@ -48,6 +54,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [faecher, setFaecher] = useLocalStorage<Fach[]>('lt.faecher', [])
   const [themen, setThemen] = useLocalStorage<Thema[]>('lt.themen', [])
   const [sessions, setSessions] = useLocalStorage<LernSession[]>('lt.sessions', [])
+  const [plan, setPlan] = useLocalStorage<Planeintrag[]>('lt.plan', [])
   const [effekteAn, setEffekteAnState] = useLocalStorage<boolean>('lt.effekte', true)
 
   const value: StoreValue = {
@@ -62,6 +69,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setFaecher((prev) => prev.filter((f) => f.id !== id))
       setThemen((prev) => prev.filter((t) => t.fachId !== id))
       setSessions((prev) => prev.filter((s) => s.fachId !== id))
+      // Plan-Einträge behalten, aber Fach-Zuordnung lösen
+      setPlan((prev) => prev.map((p) => (p.fachId === id ? { ...p, fachId: undefined } : p)))
     },
 
     addThema: (fachId, titel) =>
@@ -108,6 +117,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setSessions((prev) => [...prev, { id: uid(), fachId, minuten, datum }]),
     removeSession: (id) => setSessions((prev) => prev.filter((s) => s.id !== id)),
 
+    plan,
+    addPlan: (datum, titel, fachId) =>
+      setPlan((prev) => [...prev, { id: uid(), datum, titel, fachId, erledigt: false }]),
+    togglePlan: (id) =>
+      setPlan((prev) => prev.map((p) => (p.id === id ? { ...p, erledigt: !p.erledigt } : p))),
+    removePlan: (id) => setPlan((prev) => prev.filter((p) => p.id !== id)),
+
     exportData: () => ({
       app: 'lern-tracker',
       version: 1,
@@ -115,32 +131,31 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       faecher,
       themen,
       sessions,
+      plan,
     }),
 
     importData: (data, modus) => {
       const nf = Array.isArray(data.faecher) ? data.faecher : []
       const nt = Array.isArray(data.themen) ? data.themen : []
       const ns = Array.isArray(data.sessions) ? data.sessions : []
+      const np = Array.isArray(data.plan) ? data.plan : []
 
       if (modus === 'replace') {
         setFaecher(nf)
         setThemen(nt)
         setSessions(ns)
+        setPlan(np)
         return
       }
       // merge: nur Einträge mit neuer ID anhängen (keine Duplikate)
-      setFaecher((prev) => {
+      const anhaengen = <T extends { id: string }>(prev: T[], neu: T[]): T[] => {
         const ids = new Set(prev.map((x) => x.id))
-        return [...prev, ...nf.filter((x) => !ids.has(x.id))]
-      })
-      setThemen((prev) => {
-        const ids = new Set(prev.map((x) => x.id))
-        return [...prev, ...nt.filter((x) => !ids.has(x.id))]
-      })
-      setSessions((prev) => {
-        const ids = new Set(prev.map((x) => x.id))
-        return [...prev, ...ns.filter((x) => !ids.has(x.id))]
-      })
+        return [...prev, ...neu.filter((x) => !ids.has(x.id))]
+      }
+      setFaecher((prev) => anhaengen(prev, nf))
+      setThemen((prev) => anhaengen(prev, nt))
+      setSessions((prev) => anhaengen(prev, ns))
+      setPlan((prev) => anhaengen(prev, np))
     },
 
     effekteAn,

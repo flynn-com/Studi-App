@@ -111,7 +111,7 @@ export function Faecher() {
 
               {istOffen && (
                 <div className="border-t border-white/10 p-4">
-                  <h3 className="mb-2 text-sm font-semibold text-slate-300">Themen / Kapitel</h3>
+                  <h3 className="mb-2 text-sm font-semibold text-slate-300">Themen & Aufgaben</h3>
                   <ThemaListe fachId={f.id} />
                 </div>
               )}

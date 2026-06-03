@@ -22,7 +22,12 @@ interface StoreValue {
 
   addThema: (fachId: string, titel: string) => void
   toggleThema: (id: string) => void
+  updateThema: (id: string, data: Partial<Thema>) => void
   removeThema: (id: string) => void
+
+  addUnterpunkt: (themaId: string, titel: string) => void
+  toggleUnterpunkt: (themaId: string, upId: string) => void
+  removeUnterpunkt: (themaId: string, upId: string) => void
 
   addSession: (fachId: string, minuten: number, datum: string) => void
   removeSession: (id: string) => void
@@ -60,7 +65,39 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setThemen((prev) =>
         prev.map((t) => (t.id === id ? { ...t, erledigt: !t.erledigt } : t)),
       ),
+    updateThema: (id, data) =>
+      setThemen((prev) => prev.map((t) => (t.id === id ? { ...t, ...data } : t))),
     removeThema: (id) => setThemen((prev) => prev.filter((t) => t.id !== id)),
+
+    addUnterpunkt: (themaId, titel) =>
+      setThemen((prev) =>
+        prev.map((t) =>
+          t.id === themaId
+            ? { ...t, unterpunkte: [...(t.unterpunkte ?? []), { id: uid(), titel, erledigt: false }] }
+            : t,
+        ),
+      ),
+    toggleUnterpunkt: (themaId, upId) =>
+      setThemen((prev) =>
+        prev.map((t) =>
+          t.id === themaId
+            ? {
+                ...t,
+                unterpunkte: (t.unterpunkte ?? []).map((u) =>
+                  u.id === upId ? { ...u, erledigt: !u.erledigt } : u,
+                ),
+              }
+            : t,
+        ),
+      ),
+    removeUnterpunkt: (themaId, upId) =>
+      setThemen((prev) =>
+        prev.map((t) =>
+          t.id === themaId
+            ? { ...t, unterpunkte: (t.unterpunkte ?? []).filter((u) => u.id !== upId) }
+            : t,
+        ),
+      ),
 
     addSession: (fachId, minuten, datum) =>
       setSessions((prev) => [...prev, { id: uid(), fachId, minuten, datum }]),

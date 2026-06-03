@@ -12,11 +12,19 @@ export interface Fach {
   notizen?: string
 }
 
+export interface Unterpunkt {
+  id: string
+  titel: string
+  erledigt: boolean
+}
+
 export interface Thema {
   id: string
   fachId: string
   titel: string
   erledigt: boolean
+  notiz?: string // Details / Notizen zum Thema (mehrzeilig)
+  unterpunkte?: Unterpunkt[] // Checkliste innerhalb des Themas
 }
 
 export interface LernSession {

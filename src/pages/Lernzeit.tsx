@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { useStore } from '../store/StoreContext'
 import { PomodoroTimer } from '../components/PomodoroTimer'
+import { ProjektStoppuhr } from '../components/ProjektStoppuhr'
 import { Heatmap } from '../components/Heatmap'
+import { useLocalStorage } from '../lib/storage'
 import { heuteIso, montagDerWoche } from '../lib/datum'
 
 const inputCls =
@@ -10,6 +12,10 @@ const inputCls =
 
 export function Lernzeit() {
   const { faecher, sessions, addSession } = useStore()
+  const [timerModus, setTimerModus] = useLocalStorage<'stoppuhr' | 'pomodoro'>(
+    'lt.timerModus',
+    'stoppuhr',
+  )
   const [fachId, setFachId] = useState('')
   const [minuten, setMinuten] = useState('30')
   const [datum, setDatum] = useState(heuteIso())
@@ -54,7 +60,25 @@ export function Lernzeit() {
       </header>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <PomodoroTimer />
+        <div className="space-y-3">
+          {/* Umschalter Stoppuhr / Pomodoro */}
+          <div className="flex gap-1 rounded-xl border border-white/10 bg-slate-900/60 p-1">
+            {(['stoppuhr', 'pomodoro'] as const).map((m) => (
+              <button
+                key={m}
+                onClick={() => setTimerModus(m)}
+                className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                  timerModus === m
+                    ? 'bg-indigo-500/20 text-indigo-300 ring-1 ring-inset ring-indigo-500/40'
+                    : 'text-slate-400 hover:bg-white/5'
+                }`}
+              >
+                {m === 'stoppuhr' ? 'Stoppuhr' : 'Pomodoro'}
+              </button>
+            ))}
+          </div>
+          {timerModus === 'stoppuhr' ? <ProjektStoppuhr /> : <PomodoroTimer />}
+        </div>
 
         <div className="space-y-6">
           {/* Manuelle Erfassung */}
